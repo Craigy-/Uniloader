@@ -5,7 +5,7 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.0.1
+ * @version 1.0.2
  * @date 07.12.2014
  *
  * Dual licensed under the MIT or GPL licenses:
@@ -59,6 +59,8 @@
     },
 
     defaults: {
+      hideSelector: '.modal-close',
+      effectSpeed:  200,
       onClick: $.noop,
       onShow:  $.noop,
       onHide:  $.noop
@@ -97,7 +99,7 @@
           'left' : loader.mouseCoords.x - 15,
           'top'  : loader.mouseCoords.y - 15
         });
-        $node.show(200, function() {
+        $node.show(opts.effectSpeed, function() {
           opts.onShow();
         });
         $(document.body).on('mousemove.loader scroll.loader', $node.data('moveHandler'));
@@ -107,7 +109,7 @@
     } else { // hide node
      $node.data('depth', $node.data('depth') - 1);
       if(!$node.data('depth')) {
-        $node.hide(200, function() {
+        $node.hide(opts.effectSpeed, function() {
           $node.data('mouseOnHide')();
         });
         $(document.body).off('mousemove.loader scroll.loader', $node.data('moveHandler'));
@@ -157,6 +159,13 @@
               });
             }
           });
+
+          $node.find(opts.hideSelector).on('click.overlay', function(e) {
+            e.preventDefault();
+            $.overlayLoader(false, {
+              node: $overlay.data('loaderNode')
+            });
+          });
         }
         if(!$node.length) {
           $node = $('<div id="loader-overlay"><div class="loader-overlay-text"></div></div>');
@@ -171,13 +180,13 @@
         $overlay.data({
           'loaderNode': $node,
           'loaderOnHide': opts.onHide
-        }).fadeTo(200, .5, function() {
+        }).fadeTo(opts.effectSpeed, .5, function() {
           $(document.body).addClass('overlay-body').append($node);
           var coords = loader._centerNode($node);
           $node.css({
             'left' : coords.left,
             'top'  : coords.top
-          }).show(200, function() {
+          }).show(opts.effectSpeed, function() {
             opts.onShow();
           });
         });
@@ -192,8 +201,8 @@
           $(document.body).off('keypress.overlay');
         }
         $(window).off(resizer + '.overlay gestureend.overlay');
-        $overlay.fadeOut(200, function() {
-          $node.hide(200, function() {
+        $overlay.fadeOut(opts.effectSpeed, function() {
+          $node.hide(opts.effectSpeed, function() {
             $overlay.hide();
             $(document.body).removeClass('overlay-body');
             $overlay.data('loaderOnHide')();
