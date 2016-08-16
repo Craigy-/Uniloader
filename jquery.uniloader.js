@@ -5,8 +5,8 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.0.0
- * @date 08.07.2014
+ * @version 1.0.1
+ * @date 07.12.2014
  *
  * Dual licensed under the MIT or GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -49,8 +49,8 @@
     _centerNode: function(node) {
       var w = node.outerWidth(),
           h = node.outerHeight(),
-          x = $(window).scrollLeft() + Math.ceil($(window).width() / 2),
-          y = $(window).scrollTop() + Math.ceil($(window).height() / 2);
+          x = $(window).scrollLeft() + Math.ceil(($(window)[0].innerWidth || $(window).width()) / 2),
+          y = $(window).scrollTop() + Math.ceil(($(window)[0].innerHeight || $(window).height()) / 2);
 
       return {
         'left' : (x - w / 2) < 0 ? 0 : (x - w / 2) + 'px',
@@ -161,7 +161,7 @@
         if(!$node.length) {
           $node = $('<div id="loader-overlay"><div class="loader-overlay-text"></div></div>');
         }
-        $(window).on(resizer + '.overlay scroll.overlay', function() {
+        $(window).on(resizer + '.overlay gestureend.overlay', function() {
           var coords = loader._centerNode($node);
           $node.css({
             'left' : coords.left,
@@ -191,7 +191,7 @@
           $overlay.off('click.overlay');
           $(document.body).off('keypress.overlay');
         }
-        $(window).off(resizer + '.overlay scroll.overlay');
+        $(window).off(resizer + '.overlay gestureend.overlay');
         $overlay.fadeOut(200, function() {
           $node.hide(200, function() {
             $overlay.hide();
