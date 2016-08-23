@@ -5,8 +5,8 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.0.2
- * @date 07.12.2014
+ * @version 1.0.3
+ * @date 22.08.2016
  *
  * Dual licensed under the MIT or GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -61,7 +61,7 @@
     defaults: {
       hideSelector: '.modal-close',
       effectSpeed:  200,
-      onClick: $.noop,
+      onStart: $.noop,
       onShow:  $.noop,
       onHide:  $.noop
     }
@@ -144,7 +144,7 @@
       }
 
       if(!$overlay.data('depth')) { // show node
-        opts.onClick();
+        opts.onStart();
         if(isModal) {
           $overlay.on('click.overlay', function() {
             $.overlayLoader(false, {
