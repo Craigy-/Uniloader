@@ -6,7 +6,7 @@
  *
  * @author Grigory Zarubin (http://craigy.ru/)
  * @version 1.0.3
- * @date 22.08.2016
+ * @date 31.08.2016
  *
  * Dual licensed under the MIT or GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -14,7 +14,7 @@
  */
 
 (function($) {
-  var loader = {
+  var uniloader = {
     mouseCoords: {
       x: 0,
       y: 0
@@ -24,13 +24,13 @@
 
     init: function() {
       // Remember coordinates of the last mouse click
-      $(window).on('click.loader', function(e) {
-        loader.mouseCoords.x = e.pageX - 15;
-        loader.mouseCoords.y = e.pageY - 15;
+      $(window).on('click.uniloader', function(e) {
+        uniloader.mouseCoords.x = e.pageX - 15;
+        uniloader.mouseCoords.y = e.pageY - 15;
       });
 
       // Check browser supported APNG or not
-      loader._checkAPNGSupport();
+      uniloader._checkAPNGSupport();
     },
 
     _checkAPNGSupport: function() {
@@ -40,7 +40,7 @@
         if(cv.getContext) {
           var ctx = cv.getContext('2d');
           ctx.drawImage(APNGTest, 0, 0);
-          loader.APNGSupported = (ctx.getImageData(0, 0, 1, 1).data[3] === 0);
+          uniloader.APNGSupported = (ctx.getImageData(0, 0, 1, 1).data[3] === 0);
         }
       };
       APNGTest.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACGFjVEwAAAABAAAAAcMq2TYAAAANSURBVAiZY2BgYPgPAAEEAQB9ssjfAAAAGmZjVEwAAAAAAAAAAQAAAAEAAAAAAAAAAAD6A+gBAbNU+2sAAAARZmRBVAAAAAEImWNgYGBgAAAABQAB6MzFdgAAAABJRU5ErkJggg==';
@@ -67,42 +67,43 @@
     }
   };
 
-  // Mouse Loader
+  // Mouse loader
   $.mouseLoader = function(state, options) {
-    var $node = $('#loader-mouse');
-    var opts = $.extend(true, {}, loader.defaults, options);
+    var $node = $('#uniloader-mouse');
+    var opts = $.extend(true, {}, uniloader.defaults, options);
 
-    if(!loader.mouseCoords.x) {
-      loader.mouseCoords.x = Math.ceil($(window).width() / 2);
+    if(!uniloader.mouseCoords.x) {
+      uniloader.mouseCoords.x = Math.ceil(($(window)[0].innerWidth || $(window).width()) / 2);
     }
-    if(!loader.mouseCoords.y) {
-      loader.mouseCoords.y = Math.ceil($(window).height() / 2);
+    if(!uniloader.mouseCoords.y) {
+      uniloader.mouseCoords.y = Math.ceil(($(window)[0].innerHeight || $(window).height()) / 2);
     }
 
     if(state) { // show loader
       if(!$node.length) { // create node
-        $node = $('<div id="loader-mouse" />').data('moveHandler', function(e) {
+        $node = $('<div id="uniloader-mouse" />').data('uniloader-mousemove', function(e) {
           $node.css({
             'left' : e.pageX - 15,
             'top'  : e.pageY - 15
           });
         });
         $(document.body).append($node);
-        if(loader.APNGSupported) {
+        if(uniloader.APNGSupported) {
           $node.css('backgroundImage', $node.css('backgroundImage').replace(/ajax\.gif/gi, 'ajax.png'));
         }
         $node.data('depth', 0);
       }
 
       if(!$node.data('depth')) { // show node
-        $node.data('mouseOnHide', opts.onHide).css({
-          'left' : loader.mouseCoords.x - 15,
-          'top'  : loader.mouseCoords.y - 15
+        opts.onStart();
+        $node.data('uniloader-onHide', opts.onHide).css({
+          'left' : uniloader.mouseCoords.x - 15,
+          'top'  : uniloader.mouseCoords.y - 15
         });
         $node.show(opts.effectSpeed, function() {
           opts.onShow();
         });
-        $(document.body).on('mousemove.loader scroll.loader', $node.data('moveHandler'));
+        $(document.body).on('mousemove.uniloader scroll.uniloader', $node.data('uniloader-mousemove'));
       }
       $node.data('depth', $node.data('depth') + 1);
 
@@ -110,17 +111,17 @@
      $node.data('depth', $node.data('depth') - 1);
       if(!$node.data('depth')) {
         $node.hide(opts.effectSpeed, function() {
-          $node.data('mouseOnHide')();
+          $node.data('uniloader-onHide')();
         });
-        $(document.body).off('mousemove.loader scroll.loader', $node.data('moveHandler'));
+        $(document.body).off('mousemove.uniloader scroll.uniloader', $node.data('uniloader-mousemove'));
       }
     }
   };
 
-  // Overlay Loader
+  // Overlay loader
   $.overlayLoader = function(state, options) {
-    var $overlay = $('#overlay'),
-        $node = $('#loader-overlay'),
+    var $overlay = $('#uniloader-overlay'),
+        $node = $('#uniloader-overlay-content'),
         isModal = false;
 
     if(options && options.node) {
@@ -129,7 +130,7 @@
       delete options.node;
     }
 
-    var opts = $.extend(true, {}, loader.defaults, options);
+    var opts = $.extend(true, {}, uniloader.defaults, options);
 
     var resizer = 'resize';
     if('throttledresize' in jQuery.event.special) {
@@ -138,7 +139,7 @@
 
     if(state) { // show node
       if(!$overlay.length) { // create node
-        $overlay = $('<div id="overlay" />');
+        $overlay = $('<div id="uniloader-overlay" />');
         $(document.body).append($overlay);
         $overlay.data('depth', 0);
       }
@@ -146,43 +147,43 @@
       if(!$overlay.data('depth')) { // show node
         opts.onStart();
         if(isModal) {
-          $overlay.on('click.overlay', function() {
+          $overlay.on('click.uniloader', function() {
             $.overlayLoader(false, {
-              node: $overlay.data('loaderNode')
+              node: $overlay.data('uniloader-node')
             });
           });
 
-          $(document.body).on('keypress.overlay', function(e) {
+          $(document.body).on('keypress.uniloader', function(e) {
             if(e.keyCode == 27) {
               $.overlayLoader(false, {
-                node: $overlay.data('loaderNode')
+                node: $overlay.data('uniloader-node')
               });
             }
           });
 
-          $node.find(opts.hideSelector).on('click.overlay', function(e) {
+          $node.find(opts.hideSelector).on('click.uniloader', function(e) {
             e.preventDefault();
             $.overlayLoader(false, {
-              node: $overlay.data('loaderNode')
+              node: $overlay.data('uniloader-node')
             });
           });
         }
         if(!$node.length) {
-          $node = $('<div id="loader-overlay"><div class="loader-overlay-text"></div></div>');
+          $node = $('<div id="uniloader-overlay-content"><div class="uniloader-overlay-content-text"></div></div>');
         }
-        $(window).on(resizer + '.overlay gestureend.overlay', function() {
-          var coords = loader._centerNode($node);
+        $(window).on(resizer + '.uniloader gestureend.uniloader', function() {
+          var coords = uniloader._centerNode($node);
           $node.css({
             'left' : coords.left,
             'top'  : coords.top
           });
         });
         $overlay.data({
-          'loaderNode': $node,
-          'loaderOnHide': opts.onHide
+          'uniloader-node': $node,
+          'uniloader-onHide': opts.onHide
         }).fadeTo(opts.effectSpeed, .5, function() {
-          $(document.body).addClass('overlay-body').append($node);
-          var coords = loader._centerNode($node);
+          $(document.body).addClass('uniloader-overlay-body').append($node);
+          var coords = uniloader._centerNode($node);
           $node.css({
             'left' : coords.left,
             'top'  : coords.top
@@ -197,21 +198,21 @@
       $overlay.data('depth', $overlay.data('depth') - 1);
       if(!$overlay.data('depth')) {
         if(isModal) {
-          $overlay.off('click.overlay');
-          $(document.body).off('keypress.overlay');
+          $overlay.off('.uniloader');
+          $(document.body).off('keypress.uniloader');
         }
-        $(window).off(resizer + '.overlay gestureend.overlay');
+        $(window).off(resizer + '.uniloader gestureend.uniloader');
         $overlay.fadeOut(opts.effectSpeed, function() {
           $node.hide(opts.effectSpeed, function() {
             $overlay.hide();
-            $(document.body).removeClass('overlay-body');
-            $overlay.data('loaderOnHide')();
+            $(document.body).removeClass('uniloader-overlay-body');
+            $overlay.data('uniloader-onHide')();
           });
         });
       }
     }
   };
 
-  loader.init();
+  uniloader.init();
 
 })(jQuery);
