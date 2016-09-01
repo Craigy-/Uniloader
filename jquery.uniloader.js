@@ -29,10 +29,10 @@
         uniloader.mouseCoords.y = e.pageY - 15;
       });
 
-      // Check browser supported APNG or not
-      uniloader._checkAPNGSupport();
+      this._checkAPNGSupport();
     },
 
+    // Check browser supported APNG or not
     _checkAPNGSupport: function() {
       var APNGTest = new Image(),
           cv = document.createElement('canvas');
@@ -46,6 +46,7 @@
       APNGTest.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACGFjVEwAAAABAAAAAcMq2TYAAAANSURBVAiZY2BgYPgPAAEEAQB9ssjfAAAAGmZjVEwAAAAAAAAAAQAAAAEAAAAAAAAAAAD6A+gBAbNU+2sAAAARZmRBVAAAAAEImWNgYGBgAAAABQAB6MzFdgAAAABJRU5ErkJggg==';
     },
 
+    // Centering node in the browser window
     _centerNode: function(node) {
       var w = node.outerWidth(),
           h = node.outerHeight(),
@@ -80,6 +81,7 @@
     }
 
     if(state) { // show loader
+
       if(!$node.length) { // create node
         $node = $('<div id="uniloader-mouse" />').data('uniloader-mousemove', function(e) {
           $node.css({
@@ -91,30 +93,31 @@
         if(uniloader.APNGSupported) {
           $node.css('backgroundImage', $node.css('backgroundImage').replace(/ajax\.gif/gi, 'ajax.png'));
         }
-        $node.data('depth', 0);
       }
 
-      if(!$node.data('depth')) { // show node
-        opts.onStart();
-        $node.data('uniloader-onHide', opts.onHide).css({
-          'left' : uniloader.mouseCoords.x - 15,
-          'top'  : uniloader.mouseCoords.y - 15
-        });
-        $node.show(opts.effectSpeed, function() {
-          opts.onShow();
-        });
-        $(document.body).on('mousemove.uniloader scroll.uniloader', $node.data('uniloader-mousemove'));
+      // Show node
+      if($node.is(':visible')) {
+        return;
       }
-      $node.data('depth', $node.data('depth') + 1);
 
-    } else { // hide node
-     $node.data('depth', $node.data('depth') - 1);
-      if(!$node.data('depth')) {
-        $node.hide(opts.effectSpeed, function() {
-          $node.data('uniloader-onHide')();
-        });
-        $(document.body).off('mousemove.uniloader scroll.uniloader', $node.data('uniloader-mousemove'));
-      }
+      opts.onStart();
+      $node.data('uniloader-onHide', opts.onHide).css({
+        'left' : uniloader.mouseCoords.x - 15,
+        'top'  : uniloader.mouseCoords.y - 15
+      });
+      $node.show(opts.effectSpeed, function() {
+        opts.onShow();
+      });
+      $(document.body).on('mousemove.uniloader scroll.uniloader', $node.data('uniloader-mousemove'));
+
+    } else {
+
+      // Hide node
+      $node.hide(opts.effectSpeed, function() {
+        $node.data('uniloader-onHide')();
+      });
+      $(document.body).off('mousemove.uniloader scroll.uniloader', $node.data('uniloader-mousemove'));
+
     }
   };
 
@@ -138,78 +141,80 @@
     }
 
     if(state) { // show node
+
       if(!$overlay.length) { // create node
         $overlay = $('<div id="uniloader-overlay" />');
         $(document.body).append($overlay);
-        $overlay.data('depth', 0);
       }
 
-      if(!$overlay.data('depth')) { // show node
-        opts.onStart();
-        if(isModal) {
-          $overlay.on('click.uniloader', function() {
+      // Show node
+      if($overlay.is(':visible')) {
+        return;
+      }
+
+      opts.onStart();
+      if(isModal) {
+        $overlay.on('click.uniloader', function() {
+          $.overlayLoader(false, {
+            node: $overlay.data('uniloader-node')
+          });
+        });
+
+        $(document.body).on('keypress.uniloader', function(e) {
+          if(e.keyCode == 27) {
             $.overlayLoader(false, {
               node: $overlay.data('uniloader-node')
             });
-          });
-
-          $(document.body).on('keypress.uniloader', function(e) {
-            if(e.keyCode == 27) {
-              $.overlayLoader(false, {
-                node: $overlay.data('uniloader-node')
-              });
-            }
-          });
-
-          $node.find(opts.hideSelector).on('click.uniloader', function(e) {
-            e.preventDefault();
-            $.overlayLoader(false, {
-              node: $overlay.data('uniloader-node')
-            });
-          });
-        }
-        if(!$node.length) {
-          $node = $('<div id="uniloader-overlay-content"><div class="uniloader-overlay-content-text"></div></div>');
-        }
-        $(window).on(resizer + '.uniloader gestureend.uniloader', function() {
-          var coords = uniloader._centerNode($node);
-          $node.css({
-            'left' : coords.left,
-            'top'  : coords.top
-          });
+          }
         });
-        $overlay.data({
-          'uniloader-node': $node,
-          'uniloader-onHide': opts.onHide
-        }).fadeTo(opts.effectSpeed, .5, function() {
-          $(document.body).addClass('uniloader-overlay-body').append($node);
-          var coords = uniloader._centerNode($node);
-          $node.css({
-            'left' : coords.left,
-            'top'  : coords.top
-          }).show(opts.effectSpeed, function() {
-            opts.onShow();
+
+        $node.find(opts.hideSelector).on('click.uniloader', function(e) {
+          e.preventDefault();
+          $.overlayLoader(false, {
+            node: $overlay.data('uniloader-node')
           });
         });
       }
-      $overlay.data('depth', $overlay.data('depth') + 1);
-
-    } else if($overlay.data('depth')) { // hide node
-      $overlay.data('depth', $overlay.data('depth') - 1);
-      if(!$overlay.data('depth')) {
-        if(isModal) {
-          $overlay.off('.uniloader');
-          $(document.body).off('keypress.uniloader');
-        }
-        $(window).off(resizer + '.uniloader gestureend.uniloader');
-        $overlay.fadeOut(opts.effectSpeed, function() {
-          $node.hide(opts.effectSpeed, function() {
-            $overlay.hide();
-            $(document.body).removeClass('uniloader-overlay-body');
-            $overlay.data('uniloader-onHide')();
-          });
-        });
+      if(!$node.length) {
+        $node = $('<div id="uniloader-overlay-content"><div class="uniloader-overlay-content-text"></div></div>');
       }
+      $(window).on(resizer + '.uniloader gestureend.uniloader', function() {
+        var coords = uniloader._centerNode($node);
+        $node.css({
+          'left' : coords.left,
+          'top'  : coords.top
+        });
+      });
+      $overlay.data({
+        'uniloader-node': $node,
+        'uniloader-onHide': opts.onHide
+      }).fadeTo(opts.effectSpeed, .5, function() {
+        $(document.body).addClass('uniloader-overlay-body').append($node);
+        var coords = uniloader._centerNode($node);
+        $node.css({
+          'left' : coords.left,
+          'top'  : coords.top
+        }).show(opts.effectSpeed, function() {
+          opts.onShow();
+        });
+      });
+
+    } else {
+
+      // Hide node
+      if(isModal) {
+        $overlay.off('.uniloader');
+        $(document.body).off('keypress.uniloader');
+      }
+      $(window).off(resizer + '.uniloader gestureend.uniloader');
+      $overlay.fadeOut(opts.effectSpeed, function() {
+        $node.hide(opts.effectSpeed, function() {
+          $overlay.hide();
+          $(document.body).removeClass('uniloader-overlay-body');
+          $overlay.data('uniloader-onHide')();
+        });
+      });
+
     }
   };
 
