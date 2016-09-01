@@ -41,12 +41,21 @@
       APNGTest.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACGFjVEwAAAABAAAAAcMq2TYAAAANSURBVAiZY2BgYPgPAAEEAQB9ssjfAAAAGmZjVEwAAAAAAAAAAQAAAAEAAAAAAAAAAAD6A+gBAbNU+2sAAAARZmRBVAAAAAEImWNgYGBgAAAABQAB6MzFdgAAAABJRU5ErkJggg==';
     },
 
+    // Calculate dimensions of the browser window
+    _getWindowDimensions: function() {
+      return {
+        width: $(window)[0].innerWidth || $(window).width(),
+        height: $(window)[0].innerHeight || $(window).height()
+      };
+    },
+
     // Centering node in the browser window
     _centerNode: function(node) {
-      var w = node.outerWidth(),
+      var wd = this._getWindowDimensions(),
+          w = node.outerWidth(),
           h = node.outerHeight(),
-          x = $(window).scrollLeft() + Math.ceil(($(window)[0].innerWidth || $(window).width()) / 2),
-          y = $(window).scrollTop() + Math.ceil(($(window)[0].innerHeight || $(window).height()) / 2);
+          x = $(window).scrollLeft() + Math.ceil(wd.width / 2),
+          y = $(window).scrollTop() + Math.ceil(wd.height / 2);
 
       return {
         'left' : (x - w / 2) < 0 ? 0 : (x - w / 2) + 'px',
