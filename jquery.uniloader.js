@@ -16,8 +16,14 @@
 (function($) {
   var uniloader = {
     APNGSupported: false,
+    actualResizer: 'resize',
 
     init: function() {
+      // Supports 'throttledresize' event
+      if('throttledresize' in jQuery.event.special) {
+        this.actualResizer = 'throttledresize';
+      }
+
       this._checkAPNGSupport();
     },
 
@@ -118,11 +124,6 @@
 
     var opts = $.extend(true, {}, uniloader.defaults, options);
 
-    var resizer = 'resize';
-    if('throttledresize' in jQuery.event.special) {
-      resizer = 'throttledresize';
-    }
-
     if(state) { // show node
 
       if(!$overlay.length) { // create node
@@ -161,7 +162,7 @@
       if(!$node.length) {
         $node = $('<div id="uniloader-overlay-content"><div class="uniloader-overlay-content-text"></div></div>');
       }
-      $(window).on(resizer + '.uniloader gestureend.uniloader', function() {
+      $(window).on(uniloader.actualResizer + '.uniloader gestureend.uniloader', function() {
         var coords = uniloader._centerNode($node);
         $node.css({
           'left' : coords.left,
@@ -189,7 +190,7 @@
         $overlay.off('.uniloader');
         $(document.body).off('keypress.uniloader');
       }
-      $(window).off(resizer + '.uniloader gestureend.uniloader');
+      $(window).off(uniloader.actualResizer + '.uniloader gestureend.uniloader');
       $overlay.fadeOut(opts.effectSpeed, function() {
         $node.hide(opts.effectSpeed, function() {
           $overlay.hide();
