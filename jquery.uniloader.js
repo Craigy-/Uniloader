@@ -5,8 +5,8 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.0.3
- * @date 31.08.2016
+ * @version 1.1.0
+ * @date 01.09.2016
  *
  * Dual licensed under the MIT or GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -212,7 +212,7 @@
         'uniloader-node': $node,
         'uniloader-node-parent': $node.parent().length ? $node.parent() : $(document.body),
         'uniloader-onHide': opts.onHide
-      }).append($node).fadeTo(opts.effectSpeed, .5, function() {
+      }).append($node).fadeTo(opts.effectSpeed, 1, function() {
         var coords = uniloader._centerNode($node);
         $node.css({
           'top'  : coords.top,
