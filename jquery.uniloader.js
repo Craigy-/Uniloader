@@ -49,13 +49,28 @@
       };
     },
 
+    // Calculate the scrollbar width (0 - no scrollbar)
+    _getScrollbarWidth: function() {
+      var wd = this._getWindowDimensions();
+      if($(document).height() - wd.height <= 0) {
+        return 0;
+      }
+
+      var parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body'),
+          child = parent.children();
+      var scrollbarWidth = child.innerWidth() - child.height(99).innerWidth();
+      parent.remove();
+
+      return scrollbarWidth;
+    },
+
     // Centering node in the browser window
-    _centerNode: function(node) {
+    _centerNode: function(node, scrollable) {
       var wd = this._getWindowDimensions(),
           w = node.outerWidth(),
           h = node.outerHeight(),
-          x = $(window).scrollLeft() + Math.ceil(wd.width / 2),
-          y = $(window).scrollTop() + Math.ceil(wd.height / 2);
+          x = (scrollable ? $(window).scrollLeft() : 0) + Math.ceil(wd.width / 2),
+          y = (scrollable ? $(window).scrollTop() : 0) + Math.ceil(wd.height / 2);
 
       return {
         'left' : (x - w / 2) < 0 ? 0 : (x - w / 2) + 'px',
@@ -104,7 +119,7 @@
 
       opts.onStart();
 
-      var coords = uniloader._centerNode($node);
+      var coords = uniloader._centerNode($node, true);
       $node.css({
         'top'  : coords.top,
         'left' : coords.left
@@ -175,7 +190,9 @@
           }
         });
 
-        $node.find(opts.hideSelector).on('click.uniloader', function(e) {
+        $node.on('click', function(e) {
+          e.stopPropagation();
+        }).find(opts.hideSelector).on('click.uniloader', function(e) {
           e.preventDefault();
           $.overlayLoader();
         });
@@ -188,12 +205,14 @@
         });
       });
 
+      $('html').addClass('uniloader-overlay-html').css('margin-right', uniloader._getScrollbarWidth());
+
       $overlay.data({
         'uniloader-ismodal': isModal,
         'uniloader-node': $node,
+        'uniloader-node-parent': $node.parent().length ? $node.parent() : $(document.body),
         'uniloader-onHide': opts.onHide
-      }).fadeTo(opts.effectSpeed, .5, function() {
-        $(document.body).addClass('uniloader-overlay-body').append($node);
+      }).append($node).fadeTo(opts.effectSpeed, .5, function() {
         var coords = uniloader._centerNode($node);
         $node.css({
           'top'  : coords.top,
@@ -215,12 +234,11 @@
       }
       $(window).off(uniloader.actualResizer + '.uniloader gestureend.uniloader');
 
+      $node.hide(opts.effectSpeed);
       $overlay.fadeOut(opts.effectSpeed, function() {
-        $node.hide(opts.effectSpeed, function() {
-          $overlay.hide();
-          $(document.body).removeClass('uniloader-overlay-body');
-          $overlay.data('uniloader-onHide')();
-        });
+        $($overlay.data('uniloader-node-parent')).append($node);
+        $('html').removeClass('uniloader-overlay-html').css('margin-right', '');
+        $overlay.data('uniloader-onHide')();
       });
 
     }
