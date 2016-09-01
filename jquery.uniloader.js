@@ -15,20 +15,9 @@
 
 (function($) {
   var uniloader = {
-    mouseCoords: {
-      x: 0,
-      y: 0
-    },
-
     APNGSupported: false,
 
     init: function() {
-      // Remember coordinates of the last mouse click
-      $(window).on('click.uniloader', function(e) {
-        uniloader.mouseCoords.x = e.pageX - 15;
-        uniloader.mouseCoords.y = e.pageY - 15;
-      });
-
       this._checkAPNGSupport();
     },
 
@@ -73,20 +62,13 @@
     var $node = $('#uniloader-mouse');
     var opts = $.extend(true, {}, uniloader.defaults, options);
 
-    if(!uniloader.mouseCoords.x) {
-      uniloader.mouseCoords.x = Math.ceil(($(window)[0].innerWidth || $(window).width()) / 2);
-    }
-    if(!uniloader.mouseCoords.y) {
-      uniloader.mouseCoords.y = Math.ceil(($(window)[0].innerHeight || $(window).height()) / 2);
-    }
-
     if(state) { // show loader
 
       if(!$node.length) { // create node
         $node = $('<div id="uniloader-mouse" />').data('uniloader-mousemove', function(e) {
           $node.css({
-            'left' : e.pageX - 15,
-            'top'  : e.pageY - 15
+            'top'  : e.pageY - ($node.outerHeight() / 2),
+            'left' : e.pageX - ($node.outerWidth() / 2)
           });
         });
         $(document.body).append($node);
@@ -101,11 +83,12 @@
       }
 
       opts.onStart();
+
+      var coords = uniloader._centerNode($node);
       $node.data('uniloader-onHide', opts.onHide).css({
-        'left' : uniloader.mouseCoords.x - 15,
-        'top'  : uniloader.mouseCoords.y - 15
-      });
-      $node.show(opts.effectSpeed, function() {
+        'top'  : coords.top,
+        'left' : coords.left
+      }).show(opts.effectSpeed, function() {
         opts.onShow();
       });
       $(document.body).on('mousemove.uniloader scroll.uniloader', $node.data('uniloader-mousemove'));
