@@ -148,31 +148,27 @@
 
       // Show node
       if($overlay.is(':visible')) {
-        return;
+        $.overlayLoader(false, {
+          effectSpeed: 0
+        });
       }
 
       opts.onStart();
 
       if(isModal) {
         $overlay.on('click.uniloader', function() {
-          $.overlayLoader(false, {
-            node: $overlay.data('uniloader-node')
-          });
+          $.overlayLoader();
         });
 
         $(document.body).on('keypress.uniloader', function(e) {
           if(e.keyCode == 27) {
-            $.overlayLoader(false, {
-              node: $overlay.data('uniloader-node')
-            });
+            $.overlayLoader();
           }
         });
 
         $node.find(opts.hideSelector).on('click.uniloader', function(e) {
           e.preventDefault();
-          $.overlayLoader(false, {
-            node: $overlay.data('uniloader-node')
-          });
+          $.overlayLoader();
         });
       }
       $(window).on(uniloader.actualResizer + '.uniloader gestureend.uniloader', function() {
@@ -182,7 +178,9 @@
           'left' : coords.left
         });
       });
+
       $overlay.data({
+        'uniloader-ismodal': isModal,
         'uniloader-node': $node,
         'uniloader-onHide': opts.onHide
       }).fadeTo(opts.effectSpeed, .5, function() {
@@ -199,11 +197,15 @@
     } else {
 
       // Hide node
-      if(isModal) {
+      $node = $($overlay.data('uniloader-node'));
+
+      if($overlay.data('uniloader-ismodal')) {
         $overlay.off('.uniloader');
         $(document.body).off('keypress.uniloader');
+        $node.find(opts.hideSelector).off('.uniloader');
       }
       $(window).off(uniloader.actualResizer + '.uniloader gestureend.uniloader');
+
       $overlay.fadeOut(opts.effectSpeed, function() {
         $node.hide(opts.effectSpeed, function() {
           $overlay.hide();
