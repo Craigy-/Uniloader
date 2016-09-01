@@ -68,14 +68,19 @@
     var $node = $('#uniloader-mouse');
     var opts = $.extend(true, {}, uniloader.defaults, options);
 
-    if(state) { // show loader
+    // Show mouse loader
+    if(state) {
 
-      if(!$node.length) { // create node
-        $node = $('<div id="uniloader-mouse" />').data('uniloader-mousemove', function(e) {
-          $node.css({
-            'top'  : e.pageY - ($node.outerHeight() / 2),
-            'left' : e.pageX - ($node.outerWidth() / 2)
-          });
+      // Create node
+      if(!$node.length) {
+        $node = $('<div id="uniloader-mouse" />').data({
+          'uniloader-mousemove': function(e) {
+            $node.css({
+              'top'  : e.pageY - ($node.outerHeight() / 2),
+              'left' : e.pageX - ($node.outerWidth() / 2)
+            });
+          },
+          'uniloader-onHide': opts.onHide
         });
         $(document.body).append($node);
         if(uniloader.APNGSupported) {
@@ -91,20 +96,22 @@
       opts.onStart();
 
       var coords = uniloader._centerNode($node);
-      $node.data('uniloader-onHide', opts.onHide).css({
+      $node.css({
         'top'  : coords.top,
         'left' : coords.left
       }).show(opts.effectSpeed, function() {
         opts.onShow();
       });
+
       $(document.body).on('mousemove.uniloader scroll.uniloader', $node.data('uniloader-mousemove'));
 
     } else {
 
-      // Hide node
+      // Hide mouse loader
       $node.hide(opts.effectSpeed, function() {
         $node.data('uniloader-onHide')();
       });
+
       $(document.body).off('mousemove.uniloader scroll.uniloader', $node.data('uniloader-mousemove'));
 
     }
@@ -116,6 +123,7 @@
         $node = $('#uniloader-overlay-content'),
         isModal = false;
 
+    // 'node' is optional
     if(options && options.node) {
       $node = $(options.node);
       isModal = true;
@@ -124,11 +132,18 @@
 
     var opts = $.extend(true, {}, uniloader.defaults, options);
 
-    if(state) { // show node
+    // Show overlay loader or modal window
+    if(state) {
 
-      if(!$overlay.length) { // create node
+      // Create overlay
+      if(!$overlay.length) {
         $overlay = $('<div id="uniloader-overlay" />');
         $(document.body).append($overlay);
+      }
+
+      // Create overlay loader node
+      if(!$node.length) {
+        $node = $('<div id="uniloader-overlay-content"><div class="uniloader-overlay-content-text" /></div>');
       }
 
       // Show node
@@ -137,6 +152,7 @@
       }
 
       opts.onStart();
+
       if(isModal) {
         $overlay.on('click.uniloader', function() {
           $.overlayLoader(false, {
@@ -159,14 +175,11 @@
           });
         });
       }
-      if(!$node.length) {
-        $node = $('<div id="uniloader-overlay-content"><div class="uniloader-overlay-content-text"></div></div>');
-      }
       $(window).on(uniloader.actualResizer + '.uniloader gestureend.uniloader', function() {
         var coords = uniloader._centerNode($node);
         $node.css({
-          'left' : coords.left,
-          'top'  : coords.top
+          'top'  : coords.top,
+          'left' : coords.left
         });
       });
       $overlay.data({
@@ -176,8 +189,8 @@
         $(document.body).addClass('uniloader-overlay-body').append($node);
         var coords = uniloader._centerNode($node);
         $node.css({
-          'left' : coords.left,
-          'top'  : coords.top
+          'top'  : coords.top,
+          'left' : coords.left
         }).show(opts.effectSpeed, function() {
           opts.onShow();
         });
