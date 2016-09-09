@@ -5,8 +5,8 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.1.0
- * @date 01.09.2016
+ * @version 1.1.1
+ * @date 09.09.2016
  *
  * Dual licensed under the MIT or GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -51,15 +51,20 @@
 
     // Calculate the scrollbar width (0 - no scrollbar)
     _getScrollbarWidth: function () {
-      var wd = this._getWindowDimensions();
-      if ($(document).height() - wd.height <= 0) {
-        return 0;
+      var ww = $(window).width(),
+          scrollbarWidth = 0;
+
+      $('html').addClass('uniloader-overlay-html');
+
+      if ($(window).width() != ww) {
+        var parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body'),
+            child = parent.children();
+
+        scrollbarWidth = child.innerWidth() - child.height(99).innerWidth();
+        parent.remove();
       }
 
-      var parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body'),
-          child = parent.children();
-      var scrollbarWidth = child.innerWidth() - child.height(99).innerWidth();
-      parent.remove();
+      $('html').removeClass('uniloader-overlay-html');
 
       return scrollbarWidth;
     },
@@ -200,7 +205,7 @@
         });
       });
 
-      $('html').addClass('uniloader-overlay-html').css('margin-right', uniloader._getScrollbarWidth());
+      $('html').css('margin-right', uniloader._getScrollbarWidth()).addClass('uniloader-overlay-html');
 
       $overlay.data({
         'uniloader-ismodal': isModal,
