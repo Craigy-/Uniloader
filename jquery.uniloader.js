@@ -5,8 +5,8 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.1.1
- * @date 09.09.2016
+ * @version 1.1.2
+ * @date 12.10.2016
  *
  * Dual licensed under the MIT or GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -177,7 +177,7 @@
         });
       }
 
-      opts.onStart();
+      opts.onStart($node);
 
       if (isModal) {
         $overlay.on('click.uniloader', function () {
@@ -211,14 +211,14 @@
         'uniloader-ismodal': isModal,
         'uniloader-node': $node,
         'uniloader-node-parent': $node.parent().length ? $node.parent() : $(document.body),
-        'uniloader-onHide': opts.onHide
+        'uniloader-onHide': opts.onHide($node)
       }).append($node).fadeTo(opts.effectSpeed, 1, function () {
         var coords = uniloader._centerNode($node);
         $node.css({
           'top'  : coords.top,
           'left' : coords.left
         }).show(opts.effectSpeed, function () {
-          opts.onShow();
+          opts.onShow($node);
         });
       });
     } else {
