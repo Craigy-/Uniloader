@@ -5,8 +5,8 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.1.2
- * @date 12.10.2016
+ * @version 1.1.3
+ * @date 14.10.2016
  *
  * Dual licensed under the MIT or GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -17,6 +17,7 @@
   var uniloader = {
     APNGSupported: false,
     actualResizer: 'resize',
+    scrollbarWidth: 0,
 
     init: function () {
       // Supports 'throttledresize' event
@@ -44,15 +45,14 @@
     // Calculate dimensions of the browser window
     _getWindowDimensions: function () {
       return {
-        width: $(window)[0].innerWidth || $(window).width(),
+        width: ($(window)[0].innerWidth || $(window).width()) - this.scrollbarWidth,
         height: $(window)[0].innerHeight || $(window).height()
       };
     },
 
     // Calculate the scrollbar width (0 - no scrollbar)
     _getScrollbarWidth: function () {
-      var ww = $(window).width(),
-          scrollbarWidth = 0;
+      var ww = $(window).width();
 
       $('html').addClass('uniloader-overlay-html');
 
@@ -60,13 +60,13 @@
         var parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body'),
             child = parent.children();
 
-        scrollbarWidth = child.innerWidth() - child.height(99).innerWidth();
+        var scrollbarWidth = child.innerWidth() - child.height(99).innerWidth();
         parent.remove();
       }
 
       $('html').removeClass('uniloader-overlay-html');
 
-      return scrollbarWidth;
+      this.scrollbarWidth = scrollbarWidth;
     },
 
     // Centering node in the browser window
@@ -135,7 +135,10 @@
     } else {
       // Hide mouse loader
       $node.hide(opts.effectSpeed, function () {
-        $node.data('uniloader-onHide')();
+        try {
+          $node.data('uniloader-onHide')();
+        } catch (e) {
+        }
       });
 
       $(document.body).off('mousemove.uniloader scroll.uniloader', $node.data('uniloader-mousemove'));
@@ -205,7 +208,8 @@
         });
       });
 
-      $('html').css('margin-right', uniloader._getScrollbarWidth()).addClass('uniloader-overlay-html');
+      uniloader._getScrollbarWidth();
+      $('html').css('margin-right', uniloader.scrollbarWidth).addClass('uniloader-overlay-html');
 
       $overlay.data({
         'uniloader-ismodal': isModal,
@@ -236,7 +240,10 @@
       $overlay.fadeOut(opts.effectSpeed, function () {
         $($overlay.data('uniloader-node-parent')).append($node);
         $('html').removeClass('uniloader-overlay-html').css('margin-right', '');
-        $overlay.data('uniloader-onHide')();
+        try {
+          $overlay.data('uniloader-onHide')();
+        } catch (e) {
+        }
       });
     }
   };
