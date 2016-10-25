@@ -5,8 +5,8 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.1.3
- * @date 14.10.2016
+ * @version 1.1.4
+ * @date 25.10.2016
  *
  * Dual licensed under the MIT or GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -62,11 +62,11 @@
 
         var scrollbarWidth = child.innerWidth() - child.height(99).innerWidth();
         parent.remove();
+
+        this.scrollbarWidth = scrollbarWidth;
       }
 
       $('html').removeClass('uniloader-overlay-html');
-
-      this.scrollbarWidth = scrollbarWidth;
     },
 
     // Centering node in the browser window
