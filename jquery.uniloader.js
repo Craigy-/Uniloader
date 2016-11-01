@@ -5,8 +5,8 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.1.5
- * @date 01.11.2016
+ * @version 1.1.6
+ * @date 02.11.2016
  *
  * Dual licensed under the MIT or GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -74,12 +74,12 @@
       var wd = this._getWindowDimensions(),
           w = node.outerWidth(),
           h = node.outerHeight(),
-          x = (scrollable ? $(window).scrollLeft() : 0) + Math.ceil(wd.width / 2),
-          y = (scrollable ? $(window).scrollTop() : 0) + Math.ceil(wd.height / 2);
+          x = (scrollable ? $(window).scrollLeft() : 0) + wd.width / 2,
+          y = (scrollable ? $(window).scrollTop() : 0) + wd.height / 2;
 
       return {
-        'left' : Math.floor(x - w / 2) <= 0 ? 0 : (x - w / 2) + 'px',
-        'top'  : Math.floor(y - h / 2) <= 0 ? 0 : (y - h / 2) + 'px'
+        'left' : (x - w / 2) < 1 ? 0 : (x - w / 2) + 'px',
+        'top'  : (y - h / 2) < 1 ? 0 : (y - h / 2) + 'px'
       };
     },
 
