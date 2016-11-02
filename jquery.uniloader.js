@@ -5,7 +5,7 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.1.6
+ * @version 1.1.7
  * @date 02.11.2016
  *
  * Dual licensed under the MIT or GPL licenses:
@@ -72,8 +72,8 @@
     // Centering node in the browser window
     _centerNode: function (node, scrollable) {
       var wd = this._getWindowDimensions(),
-          w = node.outerWidth(),
-          h = node.outerHeight(),
+          w = node.outerWidth(true),
+          h = node.outerHeight(true),
           x = (scrollable ? $(window).scrollLeft() : 0) + wd.width / 2,
           y = (scrollable ? $(window).scrollTop() : 0) + wd.height / 2;
 
