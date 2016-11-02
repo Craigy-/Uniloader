@@ -9,6 +9,9 @@
   width: 32px;
   height: 32px;
 }
+#uniloader-mouse.uniloader-apng-supported {
+  background-image: url(ajax.png);
+}
 
 #uniloader-overlay {
   display: none;

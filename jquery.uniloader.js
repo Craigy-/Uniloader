@@ -5,7 +5,7 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.1.7
+ * @version 1.1.8
  * @date 02.11.2016
  *
  * Dual licensed under the MIT or GPL licenses:
@@ -19,6 +19,7 @@
     actualResizer: 'resize',
     scrollbarWidth: 0,
 
+
     init: function () {
       // Supports 'throttledresize' event
       if ('throttledresize' in jQuery.event.special) {
@@ -27,6 +28,7 @@
 
       this._checkAPNGSupport();
     },
+
 
     // Check browser supported APNG or not
     _checkAPNGSupport: function () {
@@ -83,14 +85,17 @@
       };
     },
 
+
     defaults: {
       hideSelector: '.modal-close',
-      effectSpeed:  200,
+      effectSpeed: 200,
       onStart: $.noop,
-      onShow:  $.noop,
-      onHide:  $.noop
+      onShow: $.noop,
+      onHide: $.noop
     }
   };
+
+
 
   // Mouse loader
   $.mouseLoader = function (state, options) {
@@ -104,15 +109,15 @@
         $node = $('<div id="uniloader-mouse" />').data({
           'uniloader-mousemove': function (e) {
             $node.css({
-              'top'  : e.pageY - ($node.outerHeight() / 2),
-              'left' : e.pageX - ($node.outerWidth() / 2)
+              'top'  : e.pageY - ($node.outerHeight(true) / 2),
+              'left' : e.pageX - ($node.outerWidth(true) / 2)
             });
           },
           'uniloader-onHide': opts.onHide
         });
         $(document.body).append($node);
         if (uniloader.APNGSupported) {
-          $node.css('backgroundImage', $node.css('backgroundImage').replace(/ajax\.gif/gi, 'ajax.png'));
+          $node.addClass('uniloader-apng-supported');
         }
       }
 
@@ -144,6 +149,8 @@
       $(document.body).off('mousemove.uniloader scroll.uniloader', $node.data('uniloader-mousemove'));
     }
   };
+
+
 
   // Overlay loader
   $.overlayLoader = function (state, options) {
