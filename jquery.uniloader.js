@@ -5,8 +5,8 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.1.8
- * @date 02.11.2016
+ * @version 1.1.9
+ * @date 10.02.2018
  *
  * Dual licensed under the MIT or GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -222,7 +222,7 @@
         'uniloader-ismodal': isModal,
         'uniloader-node': $node,
         'uniloader-node-parent': $node.parent().length ? $node.parent() : $(document.body),
-        'uniloader-onHide': opts.onHide($node)
+        'uniloader-onHide': opts.onHide
       }).append($node).fadeTo(opts.effectSpeed, 1, function () {
         var coords = uniloader._centerNode($node);
         $node.css({
@@ -248,7 +248,7 @@
         $($overlay.data('uniloader-node-parent')).append($node);
         $('html').removeClass('uniloader-overlay-html').css('margin-right', '');
         try {
-          $overlay.data('uniloader-onHide')();
+          $overlay.data('uniloader-onHide')($node);
         } catch (e) {
         }
       });
