@@ -5,7 +5,7 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.1.10
+ * @version 1.1.11
  * @date 11.02.2018
  *
  * Dual licensed under the MIT or GPL licenses:
@@ -90,6 +90,7 @@
     defaults: {
       hideSelector: '.modal-close',
       effectSpeed: 200,
+      fixedElements: false,
       onStart: $.noop,
       onShow: $.noop,
       onHide: $.noop
@@ -208,6 +209,7 @@
           $.overlayLoader();
         });
       }
+
       $(window).on(uniloader.actualResizer + '.uniloader gestureend.uniloader', function () {
         var coords = uniloader._centerNode($node);
         $node.css({
@@ -215,6 +217,14 @@
           'left' : coords.left
         });
       });
+
+      // We need to treat fixed elements from seizures
+      if (opts.fixedElements) {
+        $(opts.fixedElements).each(function () {
+          $(this).css('width', $(this).width());
+        });
+        $overlay.data('uniloader-fixedElements', opts.fixedElements);
+      }
 
       uniloader._getScrollbarWidth();
       $('html').css('margin-right', uniloader.scrollbarWidth).addClass('uniloader-overlay-html');
@@ -248,6 +258,12 @@
       $overlay.fadeOut(opts.effectSpeed, function () {
         $($overlay.data('uniloader-node-parent')).append($node);
         $('html').removeClass('uniloader-overlay-html').css('margin-right', '');
+        var fixedElements = $overlay.data('uniloader-fixedElements');
+        if (fixedElements) {
+          $(fixedElements).each(function () {
+            $(this).css('width', '');
+          });
+        }
         try {
           $overlay.data('uniloader-onHide')($node);
         } catch (e) {
