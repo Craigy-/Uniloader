@@ -5,8 +5,8 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.1.9
- * @date 10.02.2018
+ * @version 1.1.10
+ * @date 11.02.2018
  *
  * Dual licensed under the MIT or GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -52,20 +52,21 @@
       };
     },
 
-    // Calculate the scrollbar width (0 - no scrollbar)
+    // Calculate the scrollbar width (0 - no scrollbar, by default)
     _getScrollbarWidth: function () {
       var ww = $(window).width();
 
       $('html').addClass('uniloader-overlay-html');
 
-      if ($(window).width() != ww) {
-        var parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body'),
-            child = parent.children();
+      var mainScrollbarWidth = $(window).width() - ww;
 
-        var scrollbarWidth = child.innerWidth() - child.height(99).innerWidth();
-        parent.remove();
+      if (mainScrollbarWidth > 0) {
+        var $scrollDiv = $('<div style="width:50px;height:50px;overflow:scroll"></div>').appendTo('body'),
+            innerScrollbarWidth = $scrollDiv[0].offsetWidth - $scrollDiv[0].clientWidth;
 
-        this.scrollbarWidth = scrollbarWidth;
+        $scrollDiv.remove();
+
+        this.scrollbarWidth = Math.max(mainScrollbarWidth, innerScrollbarWidth);
       }
 
       $('html').removeClass('uniloader-overlay-html');
