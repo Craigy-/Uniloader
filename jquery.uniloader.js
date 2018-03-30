@@ -5,8 +5,8 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.1.12
- * @date 11.02.2018
+ * @version 1.1.13
+ * @date 30.03.2018
  *
  * Dual licensed under the MIT or GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -91,6 +91,7 @@
       hideSelector: '.modal-close',
       effectSpeed: 200,
       fixedElements: false,
+      replaceWindowScrollbar: true,
       onStart: $.noop,
       onShow: $.noop,
       onHide: $.noop
@@ -219,14 +220,18 @@
       });
 
       uniloader._getScrollbarWidth();
-      $('html').css('margin-right', uniloader.scrollbarWidth).addClass('uniloader-overlay-html');
 
-      // We need to treat fixed elements from seizures
-      if (opts.fixedElements) {
-        $(opts.fixedElements).each(function () {
-          $(this).css('padding-right', uniloader.scrollbarWidth);
-        });
-        $overlay.data('uniloader-fixedElements', opts.fixedElements);
+      if (opts.replaceWindowScrollbar) {
+        $('html').css('margin-right', uniloader.scrollbarWidth).addClass('uniloader-overlay-html');
+        $overlay.addClass('append-scrollbars').data('uniloader-replaceWindowScrollbar', true);
+
+        // We need to treat fixed elements from seizures
+        if (opts.fixedElements) {
+          $(opts.fixedElements).each(function () {
+            $(this).css('padding-right', uniloader.scrollbarWidth);
+          });
+          $overlay.data('uniloader-fixedElements', opts.fixedElements);
+        }
       }
 
       $overlay.data({
@@ -257,7 +262,10 @@
       $node.hide(opts.effectSpeed);
       $overlay.fadeOut(opts.effectSpeed, function () {
         $($overlay.data('uniloader-node-parent')).append($node);
-        $('html').removeClass('uniloader-overlay-html').css('margin-right', '');
+        if ($overlay.data('uniloader-replaceWindowScrollbar')) {
+          $('html').removeClass('uniloader-overlay-html').css('margin-right', '');
+          $overlay.removeClass('append-scrollbars');
+        }
         var fixedElements = $overlay.data('uniloader-fixedElements');
         if (fixedElements) {
           $(fixedElements).each(function () {
