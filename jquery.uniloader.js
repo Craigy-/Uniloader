@@ -5,7 +5,7 @@
  * @requires jQuery v1.4.3 or newer
  *
  * @author Grigory Zarubin (http://craigy.ru/)
- * @version 1.1.11
+ * @version 1.1.12
  * @date 11.02.2018
  *
  * Dual licensed under the MIT or GPL licenses:
@@ -218,16 +218,16 @@
         });
       });
 
+      uniloader._getScrollbarWidth();
+      $('html').css('margin-right', uniloader.scrollbarWidth).addClass('uniloader-overlay-html');
+
       // We need to treat fixed elements from seizures
       if (opts.fixedElements) {
         $(opts.fixedElements).each(function () {
-          $(this).css('width', $(this).width());
+          $(this).css('padding-right', uniloader.scrollbarWidth);
         });
         $overlay.data('uniloader-fixedElements', opts.fixedElements);
       }
-
-      uniloader._getScrollbarWidth();
-      $('html').css('margin-right', uniloader.scrollbarWidth).addClass('uniloader-overlay-html');
 
       $overlay.data({
         'uniloader-ismodal': isModal,
@@ -261,7 +261,7 @@
         var fixedElements = $overlay.data('uniloader-fixedElements');
         if (fixedElements) {
           $(fixedElements).each(function () {
-            $(this).css('width', '');
+            $(this).css('padding-right', '');
           });
         }
         try {
